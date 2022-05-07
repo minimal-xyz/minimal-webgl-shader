@@ -11,53 +11,51 @@ const vs = `
   uniform vec4 u_offsets;
   attribute vec2 a_position;
 
+  varying vec2 v_position;
+
   void main() {
-    gl_Position = vec4(a_position, 0, 1);
+    v_position = a_position;
+    gl_Position = vec4(a_position + vec2(0.1, 0.2), 0, 1.);
   }
 `;
 const fs = `
   precision mediump float;
 
+  varying vec2 v_position;
+
   void main() {
-    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    gl_FragColor = vec4(1., 1., 0.5, 1.0);
   }
 `;
 
 const programInfo = twgl.createProgramInfo(gl, [vs, fs]);
 
-const numLines = 10;
+const numLines = 4;
 const arrays = {
-  position: twgl.primitives.createAugmentedTypedArray(3, numLines * 2),
+  position: twgl.primitives.createAugmentedTypedArray(2, numLines * 2),
+  // indices: [0, 3, 1],
 };
 // you may also delare positions in combination with `indices` to reuse points
 
-arrays.position[0] = -0.5;
-arrays.position[1] = -0.5;
-arrays.position[2] = 0;
-arrays.position[3] = -0.5;
-arrays.position[4] = 0.5;
-arrays.position[5] = 0;
+let points = [
+  [-0.5, -0.5],
+  [-0.5, 0.5],
 
-arrays.position[6] = -0.5;
-arrays.position[7] = 0.5;
-arrays.position[8] = 0;
-arrays.position[9] = 0.5;
-arrays.position[10] = 0.5;
-arrays.position[11] = 0;
+  [-0.5, 0.5],
+  [0.5, 0.5],
 
-arrays.position[12] = 0.5;
-arrays.position[13] = 0.5;
-arrays.position[14] = 0;
-arrays.position[15] = 0.5;
-arrays.position[16] = -0.5;
-arrays.position[17] = 0;
+  [0.5, 0.5],
+  [0.5, -0.5],
 
-arrays.position[18] = 0.5;
-arrays.position[19] = -0.5;
-arrays.position[20] = 0;
-arrays.position[21] = -0.5;
-arrays.position[22] = -0.5;
-arrays.position[23] = 0;
+  [0.5, -0.5],
+  [-0.5, -0.5],
+];
+
+let idx = 0;
+for (let p of points) {
+  arrays.position[idx++] = p[0];
+  arrays.position[idx++] = p[1];
+}
 
 console.log("position", arrays.position);
 
@@ -68,8 +66,6 @@ const uniforms = {
 };
 
 function render(time) {
-  time *= 0.0001;
-
   twgl.resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -85,7 +81,7 @@ function render(time) {
   twgl.drawBufferInfo(gl, bufferInfo, gl.LINES);
   // twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES);
 
-  requestAnimationFrame(render);
+  // requestAnimationFrame(render);
 }
 
 requestAnimationFrame(render);
